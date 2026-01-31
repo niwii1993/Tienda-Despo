@@ -1,0 +1,37 @@
+STARTING FAST TEST 00:37:39
+Rich | Key:items | Id:articuloId => 400
+Rich | Key:articulos | Id:articuloId => 400
+Header Only (No Items) => 400
+Header with empty items => 400
+Suc:surcursal | Key:items | Id:articuloId => 400
+Suc:surcursal | Key:items | Id:id => 400
+Suc:surcursal | Key:items | Id:codigo => 400
+Suc:surcursal | Key:items | Id:IdArticulo => 400
+Suc:surcursal | Key:items | Id:sku => 400
+Suc:surcursal | Key:articulos | Id:articuloId => 400
+Suc:surcursal | Key:articulos | Id:id => 400
+Suc:surcursal | Key:articulos | Id:codigo => 400
+Suc:surcursal | Key:articulos | Id:IdArticulo => 400
+Suc:surcursal | Key:articulos | Id:sku => 400
+Suc:sucursal | Key:items | Id:articuloId => 400
+Suc:sucursal | Key:items | Id:id => 400
+Suc:sucursal | Key:items | Id:codigo => 400
+Suc:sucursal | Key:items | Id:IdArticulo => 400
+Suc:sucursal | Key:items | Id:sku => 400
+Suc:sucursal | Key:articulos | Id:articuloId => 400
+Suc:sucursal | Key:articulos | Id:id => 400
+Suc:sucursal | Key:articulos | Id:codigo => 400
+Suc:sucursal | Key:articulos | Id:IdArticulo => 400
+Suc:sucursal | Key:articulos | Id:sku => 400
+Suc:Sucursal | Key:items | Id:articuloId => 400
+Suc:Sucursal | Key:items | Id:id => 400
+Suc:Sucursal | Key:items | Id:codigo => 400
+Suc:Sucursal | Key:items | Id:IdArticulo => 400
+Suc:Sucursal | Key:items | Id:sku => 400
+Suc:Sucursal | Key:articulos | Id:articuloId => 400
+Suc:Sucursal | Key:articulos | Id:id => 400
+Suc:Sucursal | Key:articulos | Id:codigo => 400
+Suc:Sucursal | Key:articulos | Id:IdArticulo => 400
+Suc:Sucursal | Key:articulos | Id:sku => 400
+Key:items | FlatArray => 400
+DONE

@@ -1,0 +1,66 @@
+TEST RESULT 2026-01-30 23:48:05
+=================================
+
+Endpoint: ExportComprobantes
+STATUS: FAILED (404)
+------------------------------
+Endpoint: ExportCtaCte
+STATUS: FAILED (404)
+------------------------------
+Endpoint: ExportSaldos
+STATUS: FAILED (404)
+------------------------------
+Endpoint: ExportVendedores
+STATUS: FOUND (200)
+SAMPLE: Array
+(
+    [0] => Array
+        (
+            [id] => 092
+            [nombre] => CLAUDIO MAIDANA
+            [desactivado] => N
+            [sucursal] => 0001
+            [depositosDeVenta] => 
+            [empresaPorDefecto] => 
+            [empresas] => 
+            [email] => 
+            [divisionesarticulo] => 
+            [supervisorId] => 0
+            [supervisor] => SUPERVISOR
+        )
+
+)
+
+------------------------------
+Endpoint: ExportRubros
+STATUS: FAILED (404)
+------------------------------
+Endpoint: ExportMarcas
+STATUS: FAILED (404)
+------------------------------
+Endpoint: ExportZonas
+STATUS: FAILED (404)
+------------------------------
+Endpoint: ExportListasPrecios
+STATUS: FAILED (404)
+------------------------------
+Endpoint: ExportStock
+STATUS: FOUND (200)
+SAMPLE: Array
+(
+    [0] => Array
+        (
+            [articuloId] => E8858
+            [eanUnidad] => 7890579154906
+            [eanDisplay] => 
+            [eanBulto] => 
+            [stock] => 0
+            [stockFisico] => 0
+            [stockReservado] => 0
+            [stockBloqueado] => 0
+            [cantidadAlternativa] => 0
+        )
+
+)
+
+------------------------------

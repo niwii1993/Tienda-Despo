@@ -1,0 +1,84 @@
+CLIENT SEARCH RESULT:
+FOUND 772267:
+Array
+(
+    [id] => 772267
+    [nombre] => ACEVEDO EMILIO ESTEBAN
+    [rubroCodigo] => 01
+    [rubroDescripcion] => KIOSCO
+    [grupoCodigo] => UC
+    [grupoDescripcion] => COMPRE AHORA
+    [zona] => SAN LORENZO
+    [telefono] => 3782413066
+    [condicionIva] => CF
+    [aplicacionIva] => 100
+    [aplicacionImpuestosInternos] => 100
+    [tipoDocumento] => DNI
+    [numeroDocumento] => 23035901
+    [numeroIibb] => 
+    [idClienteMadre] => 
+    [calle] => LIBERTAD ESQ GRAL PAZ
+    [altura] => 
+    [localidad] => SAN LORENZO
+    [partido] => 
+    [provincia] => CORRIENTES
+    [ubicacion] => 
+    [codigoPostal] => 
+    [latitud] => -28.122747
+    [longitud] => -58.7682631
+    [eMail] => 
+    [suspendido] => 
+    [desactivado] => 
+    [cobrador] => 29
+    [observacion] => 
+    [fechaAlta] => 2024-04-02T00:00:00.000-03:00
+    [empresaCodigo] => 
+    [ultimaModificacion] => 2025-10-21T13:45:45.000-03:00
+    [vendedorPredeterminado] => 229
+    [vendedores] => Array
+        (
+            [0] => Array
+                (
+                    [vendedor] => 229
+                    [condicionVenta] => CE
+                    [condicionVentaDescripcion] => CD CONTADO CONTADO
+                    [listaDePrecio] => 3
+                    [descuento] => 0
+                    [diaDeVisita] => 3
+                    [ordenDeVisita] => 
+                    [repardoId] => 158
+                    [repartoDescripcion] => SAN LORENZO
+                    [frecuenciaVisita] => 
+                )
+
+        )
+
+    [sucursales] => Array
+        (
+            [0] => Array
+                (
+                    [codigo] => 0001
+                    [nombre] => Emilio Acevedo
+                    [direccion] => 
+                    [localidad] => 
+                    [provincia] => 
+                    [direccionEntrega] => 
+                )
+
+        )
+
+    [tags] => Array
+        (
+        )
+
+    [attributes] => Array
+        (
+            [sys_zona] => 158
+            [sys_grupo] => UC
+            [sys_rubro] => 01
+        )
+
+    [leyendaFactura] => 
+    [limiteCredito] => 0
+)
+

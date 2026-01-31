@@ -1,0 +1,81 @@
+TEST RESULT 00:21:13
+VARIATION: Minimal camelCase
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: [{"clienteId":"772267","items":[]}]
+------------------------------
+VARIATION: Minimal PascalCase
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: [{"ClienteId":"772267","Items":[]}]
+------------------------------
+VARIATION: Minimal Lowercase
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: [{"cliente":"772267","items":[]}]
+------------------------------
+VARIATION: Sigma Style
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: [{"id":"9999","clienteId":"772267","vendedorId":"002"}]
+------------------------------
+VARIATION: Array with Empty Object
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: [{}]
+------------------------------
+VARIATION: Array with Integer ID
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: [{"id":123}]
+------------------------------
+VARIATION: Array with String ID
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: [{"id":"123"}]
+------------------------------
+VARIATION: Root Pedido Wrapper
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: {"pedido":{"id":4,"deviceId":"WEB","fecha":"2026-01-31","clienteId":"772267","vendedor":"002","items":[{"articuloId":"1013229","cantidad":1,"precioUnitario":3275.26,"esPrecioFinal":false,"descuento":0}],"hora":"00:21:13"}}
+------------------------------
+VARIATION: Legacy Fields
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: {"IdCliente":"772267","Items":[{"IdArticulo":"1013229","Cantidad":1}]}
+------------------------------
+VARIATION: Original
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: {"id":4,"deviceId":"WEB","fecha":"2026-01-31","clienteId":"772267","vendedor":"002","items":[{"articuloId":"1013229","cantidad":1,"precioUnitario":3275.26,"esPrecioFinal":false,"descuento":0}],"hora":"00:21:13"}
+------------------------------
+VARIATION: No ID
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: {"deviceId":"WEB","fecha":"2026-01-31","clienteId":"772267","vendedor":"002","items":[{"articuloId":"1013229","cantidad":1,"precioUnitario":3275.26,"esPrecioFinal":false,"descuento":0}],"hora":"00:21:13"}
+------------------------------
+VARIATION: No Device/Hora
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: {"id":4,"fecha":"2026-01-31","clienteId":"772267","vendedor":"002","items":[{"articuloId":"1013229","cantidad":1,"precioUnitario":3275.26,"esPrecioFinal":false,"descuento":0}]}
+------------------------------
+VARIATION: Fecha d/m/Y
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: {"id":4,"deviceId":"WEB","fecha":"31\/01\/2026","clienteId":"772267","vendedor":"002","items":[{"articuloId":"1013229","cantidad":1,"precioUnitario":3275.26,"esPrecioFinal":false,"descuento":0}],"hora":"00:21:13"}
+------------------------------
+VARIATION: Items as Detalles
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: {"id":4,"deviceId":"WEB","fecha":"2026-01-31","clienteId":"772267","vendedor":"002","hora":"00:21:13","detalles":[{"articuloId":"1013229","cantidad":1,"precioUnitario":3275.26,"esPrecioFinal":false,"descuento":0}]}
+------------------------------
+VARIATION: ArticuloId as Codigo
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: {"id":4,"deviceId":"WEB","fecha":"2026-01-31","clienteId":"772267","vendedor":"002","items":[{"cantidad":1,"precioUnitario":3275.26,"esPrecioFinal":false,"descuento":0,"codigo":"1013229"}],"hora":"00:21:13"}
+------------------------------
+VARIATION: Minimal
+HTTP: 400
+ERROR: formato del json incorrecto
+PAYLOAD: {"clienteId":"772267","items":[{"articuloId":"1013229","cantidad":1}]}
+------------------------------

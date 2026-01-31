@@ -1,0 +1,20 @@
+Array
+(
+    [response] => 
+    [raw_response] => Not Found
+    [http_code] => 404
+    [final_url] => https://secure.sig2k.com/sigmasaas/unidespo@sigma/sigma/api/v10/ImportCliente
+    [headers] => Array
+        (
+            [Server] => nginx/1.18.0 (Ubuntu)
+            [Date] => Sat, 31 Jan 2026 00:08:57 GMT
+            [Content-Type] => text/plain; charset=utf-8
+            [Content-Length] => 9
+            [Connection] => keep-alive
+            [Location] => https://secure.sig2k.com/sigmasaas/unidespo@sigma/sigma/api/v10/ImportCliente
+            [Cache-control] => no-cache
+            [Pragma] => no-cache
+            [X-Sig-ServerVersion] => 2601151915
+        )
+
+)

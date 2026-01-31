@@ -1,0 +1,5 @@
+Codigo,Nombre,Costo,Margen,Stock,Categoria,EsNovedad,EsOferta,Descuento
+77900401,Bon o Bon Original,250.00,30,100,Chocolates,0,0,0
+77900402,Turrón Arcor,80.00,40,500,Golosinas,0,1,10
+77900403,Galletitas Maná,350.50,30,200,Galletas,1,0,0
+77900404,Mermelada Arcor,500.00,25,50,Almacén,0,0,0

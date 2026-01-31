@@ -1,0 +1,16 @@
+TEST SCHEMA EXTENDED 00:34:38
+Date Y-m-d failed for all keys.
+Date d/m/Y failed for all keys.
+Date Ymd failed for all keys.
+Date d-m-Y failed for all keys.
+KEY: items (Int Client) | HTTP: 400
+KEY: Items (Int Client) | HTTP: 400
+KEY: articulos (Int Client) | HTTP: 400
+KEY: Articulos (Int Client) | HTTP: 400
+KEY: detalles (Int Client) | HTTP: 400
+KEY: Detalles (Int Client) | HTTP: 400
+KEY: rows (Int Client) | HTTP: 400
+KEY: Rows (Int Client) | HTTP: 400
+KEY: detallesPedido (Int Client) | HTTP: 400
+KEY: DetallesPedido (Int Client) | HTTP: 400
+KEY: itemsPedido (Int Client) | HTTP: 400

@@ -1,0 +1,63 @@
+Array
+(
+    [id] => 202510
+    [descripcion] => BOLSA DE BOMBONES
+    [presentacion] => 
+    [rubroCodigo] => 1112
+    [rubroDescripcion] => PROD. DEL LOCAL
+    [linea] => 
+    [lineaCodigo] => 
+    [divisionCodigo] => 
+    [division] => 
+    [fabrica] => 
+    [grupoCodigo] => 162
+    [grupoDescripcion] => PRODUCTOSDELLOCAL
+    [marca] => 
+    [eanUnidad] => 
+    [eanDisplay] => 
+    [eanBulto] => 
+    [unidadesPorDisplay] => 1
+    [unidadesPorBulto] => 1
+    [bultosPorPallets] => 0
+    [codigoCompra] => 202510
+    [proveedorCodigo] => 00992
+    [proveedorNombre] => ARCOR S.A.I.C.
+    [impuestoInternoFijo] => 0
+    [impuestoInternoPorcentual] => 0
+    [descuentoFijo] => 0
+    [ignoraDescuentosAlPie] => N
+    [suspendido] => false
+    [desactivado] => false
+    [enListaPrecios] => true
+    [recargoFraccionamiento] => 
+    [ivaPorcentual] => 21
+    [ivaCondicionFiscal] => G21
+    [ventaPorLote] => N
+    [litrosUnitarios] => 0
+    [kilosUnitarios] => 0
+    [ventaMinima] => 0
+    [ubicacionEnDeposito] => 
+    [observacion] => 
+    [fechaAlta] => 2025-10-02T17:23:56.000-03:00
+    [ultimaModificacion] => 2026-01-10T08:59:25.000-03:00
+    [descripcionLarga] => 
+    [costoUltimaCrompa] => 0
+    [costoPromedioPonderado] => 0
+    [costoManual] => 0
+    [costoTeorico] => 2279.8518
+    [costoListaProveedor] => 2279.8518
+    [cantidadAlternativa] => false
+    [stockMinimo] => 0
+    [tags] => Array
+        (
+        )
+
+    [attributes] => Array
+        (
+            [marca] => 
+            [sys_grupo] => 162
+            [sys_rubro] => 1112
+            [sys_proveedor] => 00992
+        )
+
+)
