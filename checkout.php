@@ -55,29 +55,70 @@ function formatMoney($val)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirmar'])) {
 
     // 1. Create Order
-    $stmt = $conn->prepare("INSERT INTO orders (user_id, total, estado) VALUES (?, ?, 'pendiente')");
-    $stmt->bind_param("id", $user_id, $total_final);
+    // Start Transaction
+    // Start Transaction
+    $conn->begin_transaction();
 
-    if ($stmt->execute()) {
+    try {
+        // 1. Verify Stock Logic (Locking)
+        // Check ALL items stock before creating order
+        $stmt_check = $conn->prepare("SELECT stock FROM products WHERE id = ? FOR UPDATE");
+
+        foreach ($_SESSION['carrito'] as $prod_id => $item) {
+            $stmt_check->bind_param("i", $item['id']);
+            $stmt_check->execute();
+            $result = $stmt_check->get_result();
+
+            if ($result->num_rows == 0) {
+                throw new Exception("Producto ID {$item['id']} no encontrado");
+            }
+
+            $current_stock = $result->fetch_assoc()['stock'];
+
+            if ($current_stock < $item['cantidad']) {
+                throw new Exception("Stock insuficiente para: {$item['nombre']}. Disponible: {$current_stock}");
+            }
+        }
+
+        // 2. Create Order (Only if stock is guaranteed)
+        $stmt = $conn->prepare("INSERT INTO orders (user_id, total, estado) VALUES (?, ?, 'pendiente')");
+        $stmt->bind_param("id", $user_id, $total_final);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Error al crear la orden: " . $conn->error);
+        }
+
         $order_id = $stmt->insert_id;
 
-        // 2. Insert Order Items
+        // 3. Insert Items and Reduce Stock
         $sql_items = "INSERT INTO order_items (order_id, product_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
         $stmt_item = $conn->prepare($sql_items);
 
-        foreach ($_SESSION['carrito'] as $prod_id => $item) {
-            $stmt_item->bind_param("iiid", $order_id, $item['id'], $item['cantidad'], $item['precio']);
-            $stmt_item->execute();
+        $sql_stock = "UPDATE products SET stock = stock - ? WHERE id = ?";
+        $stmt_stock = $conn->prepare($sql_stock);
 
-            // Optional: Reduce Stock here 
-            $conn->query("UPDATE products SET stock = stock - {$item['cantidad']} WHERE id = {$item['id']}");
+        foreach ($_SESSION['carrito'] as $prod_id => $item) {
+            // Insert Item
+            $stmt_item->bind_param("iiid", $order_id, $item['id'], $item['cantidad'], $item['precio']);
+            if (!$stmt_item->execute()) {
+                throw new Exception("Error al guardar item: " . $stmt_item->error);
+            }
+
+            // Reduce Stock
+            $stmt_stock->bind_param("ii", $item['cantidad'], $item['id']);
+            if (!$stmt_stock->execute()) {
+                throw new Exception("Error al actualizar stock: " . $conn->error);
+            }
         }
 
-        // 3. Clear Cart
-        $cart_backup = $_SESSION['carrito']; // Keep a backup for email
+        // 4. Commit Transaction
+        $conn->commit();
+
+        // 5. Clear Cart & Send Emails (After Commit)
+        $cart_backup = $_SESSION['carrito'];
         unset($_SESSION['carrito']);
 
-        // 4. Send Emails
+        // ... Email Logic ...
         $to_client = $user['email'];
         $subject_client = "Confirmación de Pedido #" . $order_id . " - Grupo Despo";
 
@@ -135,12 +176,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirmar'])) {
         $subject_admin = "Nuevo Pedido #" . $order_id . " - Cliente: " . $user['nombre'];
         @mail($admin_email, $subject_admin, $message_html, $headers);
 
-        // 5. Redirect to Success Page
+        // 6. Redirect to Success Page
         header("Location: checkout_success.php?order=" . $order_id);
         exit();
 
-    } else {
-        $error = "Error al procesar el pedido: " . $conn->error;
+    } catch (Exception $e) {
+        $conn->rollback();
+        $error = "Error al procesar el pedido: " . $e->getMessage();
     }
 }
 ?>
@@ -153,6 +195,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['confirmar'])) {
     <title>Finalizar Compra - Grupo Despo</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+
+    <?php if (isset($error)): ?>
+        <script>
+            alert('<?php echo addslashes($error); ?>');
+        </script>
+    <?php endif; ?>
 </head>
 
 <body>

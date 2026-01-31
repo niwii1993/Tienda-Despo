@@ -71,16 +71,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 }
 
 // Fetch Products
-// Fetch Products with Search
+// Search Logic with Prepared Statements
 $search_query = "";
-// Fetch Products
-// Fetch Products with Search
-$search_query = "";
-$where_parts = []; // Initialize explicitly
+$where_parts = [];
+$params = [];
+$types = "";
 
 if (isset($_GET['q']) && !empty($_GET['q'])) {
-    $search_query = $conn->real_escape_string($_GET['q']);
-    $where_parts[] = "(nombre LIKE '%$search_query%' OR codigo_barras LIKE '%$search_query%' OR sigma_id LIKE '%$search_query%')";
+    $search_term = "%" . $_GET['q'] . "%";
+    $where_parts[] = "(nombre LIKE ? OR codigo_barras LIKE ? OR sigma_id LIKE ?)";
+    $params[] = $search_term;
+    $params[] = $search_term;
+    $params[] = $search_term;
+    $types .= "sss";
 }
 
 if (isset($_GET['stock_only']) && $_GET['stock_only'] == '1') {
@@ -99,13 +102,30 @@ $offset = ($page - 1) * $items_per_page;
 
 // Count Total Items
 $count_sql = "SELECT COUNT(*) as total FROM products $where_clause";
-$count_res = $conn->query($count_sql);
-$total_row = $count_res->fetch_assoc();
+$stmt_count = $conn->prepare($count_sql);
+
+if (!empty($params)) {
+    $stmt_count->bind_param($types, ...$params);
+}
+
+$stmt_count->execute();
+$total_row = $stmt_count->get_result()->fetch_assoc();
 $total_items = $total_row['total'];
 $total_pages = ceil($total_items / $items_per_page);
 
 // Fetch Products with Limit
-$productos = $conn->query("SELECT * FROM products $where_clause ORDER BY id DESC LIMIT $offset, $items_per_page");
+$sql = "SELECT * FROM products $where_clause ORDER BY id DESC LIMIT ?, ?";
+$stmt = $conn->prepare($sql);
+
+// Add Limit/Offset to params
+$types_with_limit = $types . "ii";
+$params_with_limit = $params;
+$params_with_limit[] = $offset;
+$params_with_limit[] = $items_per_page;
+
+$stmt->bind_param($types_with_limit, ...$params_with_limit);
+$stmt->execute();
+$productos = $stmt->get_result();
 
 include 'includes/header.php';
 ?>

@@ -208,77 +208,11 @@ if ($check_table && $check_table->num_rows > 0) {
                 $resultInitial = $conn->query($sqlInitial);
 
                 if ($resultInitial && $resultInitial->num_rows > 0):
+                    require_once 'includes/components/product_card.php';
                     while ($product = $resultInitial->fetch_assoc()):
-                        // Reuse Card Logic / Include or Inline
-                        $img_url = !empty($product['imagen_url']) ? $product['imagen_url'] : 'https://via.placeholder.com/200x250/e0e0e0/333333?text=Sin+Imagen';
-                        ?>
-                        <article class="product-card" data-id="<?php echo $product['id']; ?>">
-                            <?php if ($product['es_oferta']): ?>
-                                <div class="badge discount">-<?php echo intval($product['descuento_porcentaje']); ?>%</div>
-                            <?php elseif ($product['es_novedad']): ?>
-                                <div class="badge new">Nuevo</div>
-                            <?php endif; ?>
-
-                            <div class="product-image">
-                                <img src="<?php echo $img_url; ?>" alt="<?php echo htmlspecialchars($product['nombre']); ?>">
-                            </div>
-
-                            <div class="product-info">
-                                <span class="brand-tag"><?php echo htmlspecialchars($product['categoria']); ?></span>
-                                <h4><?php echo htmlspecialchars($product['nombre']); ?></h4>
-
-                                <?php if ($product['stock'] > 0 && $product['stock'] < 10): ?>
-                                    <div class="badge low-stock-inline">¡Últimas Unidades!</div>
-                                <?php endif; ?>
-
-                                <?php if (isset($_SESSION['user_id'])): ?>
-                                    <div class="price-container">
-                                        <?php if ($product['es_oferta'] == 1 && $product['descuento_porcentaje'] > 0):
-                                            $precio_final = $product['precio_venta'] * (1 - ($product['descuento_porcentaje'] / 100));
-                                            ?>
-                                            <div class="price old"><?php echo formatPrecio($product['precio_venta']); ?></div>
-                                            <div class="price offer"><?php echo formatPrecio($precio_final); ?></div>
-                                        <?php else: ?>
-                                            <div class="price"><?php echo formatPrecio($product['precio_venta']); ?></div>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <div class="card-actions">
-                                        <button class="btn-add-initial" onclick="initAddToCart(this)">
-                                            <i class="fa-solid fa-cart-desktop"></i> Agregar
-                                        </button>
-                                        <div class="quantity-control" style="display: none;">
-                                            <button type="button" class="qty-btn minus" onclick="updateQty(this, -1)">-</button>
-                                            <input type="number" class="qty-input" value="1" readonly>
-                                            <button type="button" class="qty-btn plus" onclick="updateQty(this, 1)">+</button>
-                                        </div>
-                                    </div>
-                                <?php else: ?>
-                                    <!-- Guest View: Login to see price -->
-                                    <div class="login-price-container"
-                                        style="text-align: center; margin-top: 15px; margin-bottom: 10px;">
-                                        <a href="login.php" class="btn-login-price" style="
-                                            background-color: #1565C0; /* Dark Blue */
-                                            color: white;
-                                            padding: 8px 20px;
-                                            border-radius: 50px; /* Pill shape */
-                                            text-decoration: none;
-                                            font-size: 14px;
-                                            font-weight: 700;
-                                            display: inline-block;
-                                            text-align: center;
-                                            box-shadow: 0 4px 10px rgba(21, 101, 192, 0.3);
-                                            transition: all 0.3s ease;
-                                            line-height: 1.2;
-                                        ">
-                                            INICIA SESIÓN<br>
-                                            <span style="font-size: 12px; font-weight: 500;">para ver precio</span>
-                                        </a>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </article>
-                    <?php endwhile; ?>
+                        renderProductCard($product);
+                    endwhile;
+                    ?>
                 <?php else: ?>
                     <p style="text-align:center; grid-column:1/-1;">No hay productos disponibles.</p>
                 <?php endif; ?>

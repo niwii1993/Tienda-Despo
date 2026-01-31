@@ -7,27 +7,57 @@ $active = 'clientes';
 $page_title = 'Gestión de Clientes';
 
 // Helper for filtering
-$where = "WHERE u.role = 'cliente'"; // Default filter
+// Helper for filtering
+$where_clauses = ["u.role = 'cliente'"];
+$params = [];
+$types = "";
+
 if (isset($_GET['q']) && !empty($_GET['q'])) {
-    $q = $conn->real_escape_string($_GET['q']);
-    $where .= " AND (u.nombre LIKE '%$q%' OR u.apellido LIKE '%$q%' OR u.email LIKE '%$q%' OR u.sigma_id LIKE '%$q%')";
+    $search_term = "%" . $_GET['q'] . "%";
+    $where_clauses[] = "(u.nombre LIKE ? OR u.apellido LIKE ? OR u.email LIKE ? OR u.sigma_id LIKE ?)";
+    $params[] = $search_term;
+    $params[] = $search_term;
+    $params[] = $search_term;
+    $params[] = $search_term;
+    $types .= "ssss";
 }
+
+$where_sql = "WHERE " . implode(" AND ", $where_clauses);
 
 // Pagination
 $limit = 20;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
+// 1. Fetch Users
 $sql = "SELECT u.*, s.nombre as vendedor_nombre 
         FROM users u 
         LEFT JOIN sellers s ON u.seller_id = s.sigma_id 
-        $where 
-        ORDER BY u.nombre ASC LIMIT $limit OFFSET $offset";
-$result = $conn->query($sql);
+        $where_sql 
+        ORDER BY u.nombre ASC LIMIT ?, ?";
 
-$total_sql = "SELECT COUNT(*) as total FROM users u $where";
-$total_result = $conn->query($total_sql);
-$total_rows = $total_result->fetch_assoc()['total'];
+$stmt = $conn->prepare($sql);
+
+// Add limit/offset to params
+$query_params = $params;
+$query_params[] = $limit;
+$query_params[] = $offset;
+$query_types = $types . "ii";
+
+$stmt->bind_param($query_types, ...$query_params);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// 2. Count Total
+$total_sql = "SELECT COUNT(*) as total FROM users u $where_sql";
+$stmt_count = $conn->prepare($total_sql);
+
+if (!empty($params)) {
+    $stmt_count->bind_param($types, ...$params);
+}
+
+$stmt_count->execute();
+$total_rows = $stmt_count->get_result()->fetch_assoc()['total'];
 $total_pages = ceil($total_rows / $limit);
 
 include 'includes/header.php';
