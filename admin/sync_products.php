@@ -151,7 +151,7 @@ if (isset($_POST['sync'])) {
                 } else {
                     // Insert
                     $initial_price = $cost * 1.30; // Cost + 30% default
-                    $stmtInsert->bind_param("ssddisssi", $id, $name, $cost, $initial_price, $stock, $barcode, $category, $bulto);
+                    $stmtInsert->bind_param("ssddissi", $id, $name, $cost, $initial_price, $stock, $barcode, $category, $bulto);
                     $stmtInsert->execute();
                     $created++;
                 }

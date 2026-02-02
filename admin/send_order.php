@@ -1,99 +1,126 @@
 <?php
-// admin/send_order.php
-require_once '../config/db.php';
-require_once '../config/apisigma.php';
+// ================= INCLUDES =================
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/apisigma.php';
 
-// Check Admin Access
-require_once 'includes/auth_check.php';
-
-// Ensure an order ID is provided
-if (!isset($_GET['id'])) {
-    die("ID de pedido no especificado.");
+// ================= VALIDACION =================
+$orderId = isset($_GET['id']) ? intval($_GET['id']) : 0;
+if ($orderId <= 0) {
+    die("ID de pedido inválido");
 }
 
-$orderId = intval($_GET['id']);
+// ================= CABECERA PEDIDO =================
+// Use MySQLi and correct table specific to this project (orders joined with users)
+$sql = "SELECT o.id, o.created_at as fecha, u.sigma_id as cliente_id, u.seller_id as vendedor
+        FROM orders o
+        JOIN users u ON o.user_id = u.id
+        WHERE o.id = ?";
 
-// Fetch Order (MySQLi)
-$sqlOrder = "SELECT o.*, u.sigma_id, u.seller_id FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = $orderId";
-$resOrder = $conn->query($sqlOrder);
-$order = $resOrder->fetch_assoc();
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $orderId);
+$stmt->execute();
+$result = $stmt->get_result();
+$pedido = $result->fetch_assoc();
 
-if (!$order) {
-    die("Pedido no encontrado.");
-}
-if (empty($order['sigma_id'])) {
-    die("Error: El cliente asociado no tiene un ID de Sigma configurado (sigma_id). Sincronice el cliente primero.");
-}
-
-// Fetch Items (MySQLi)
-$sqlItems = "SELECT oi.*, p.sigma_id FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = $orderId";
-$resItems = $conn->query($sqlItems);
-
-$items = [];
-while ($row = $resItems->fetch_assoc()) {
-    $items[] = $row;
+if (!$pedido) {
+    die("Pedido no encontrado");
 }
 
-if (empty($items)) {
-    die("El pedido no tiene items.");
+if (empty($pedido['cliente_id'])) {
+    die("El cliente no tiene ID de Sigma asignado.");
 }
 
-// Build JSON Payload
-$jsonItems = [];
-foreach ($items as $item) {
-    if (empty($item['sigma_id'])) {
-        die("Error: El producto ID " . $item['product_id'] . " no está sincronizado con Sigma.");
-    }
+// ================= ITEMS =================
+// Use order_items joined with products to get article ID (sigma_id)
+$sqlItems = "SELECT oi.cantidad, oi.precio_unitario, p.sigma_id as articulo_id
+             FROM order_items oi
+             JOIN products p ON oi.product_id = p.id
+             WHERE oi.order_id = ?";
 
-    $jsonItems[] = [
-        "articuloId" => (string) $item['sigma_id'],
-        "cantidad" => (float) $item['cantidad'],
-        "precioUnitario" => (float) $item['precio_unitario'],
+$stmt = $conn->prepare($sqlItems);
+$stmt->bind_param("i", $orderId);
+$stmt->execute();
+$resultItems = $stmt->get_result();
+
+$itemsDB = [];
+while ($row = $resultItems->fetch_assoc()) {
+    $itemsDB[] = $row;
+}
+
+if (empty($itemsDB)) {
+    die("Pedido sin items");
+}
+
+// ================= ARMAR JSON SIGMA =================
+// Prepare helpers for missing fields (using defaults based on previous context)
+$fecha = !empty($pedido['fecha']) ? date("Y-m-d", strtotime($pedido['fecha'])) : date("Y-m-d");
+$vendedor = !empty($pedido['vendedor']) ? str_pad($pedido['vendedor'], 3, "0", STR_PAD_LEFT) : "002"; // Fallback default
+$listaPrecios = "3"; // Default from previous code
+$condicionVenta = "CE"; // Default from previous code
+
+$payload = [
+    "id" => (int) $pedido['id'],
+    "deviceId" => "API",
+    "fecha" => $fecha,
+    "vendedor" => $vendedor,
+    "clienteId" => (string) $pedido['cliente_id'],
+    "hora" => date("H:i:s"),
+    "listaPrecios" => $listaPrecios,
+    "condicionDeVenta" => $condicionVenta,
+    "items" => []
+];
+
+foreach ($itemsDB as $i) {
+    if (empty($i['articulo_id']))
+        continue; // Skip if no sigma_id
+
+    $payload['items'][] = [
+        "articuloId" => (string) $i['articulo_id'],
+        "cantidad" => (float) $i['cantidad'],
+        "precioUnitario" => (float) $i['precio_unitario'],
         "esPrecioFinal" => false,
-        "descuento" => 0
+        "descuento" => 0 // Default 0 as not tracked in simple order items
     ];
 }
 
-$payload = [
-    "id" => (int) $order['id'],
-    "fecha" => date('Y-m-d'),
-    "clienteId" => $order['sigma_id'],
-    "vendedor" => (!empty($order['seller_id']) ? $order['seller_id'] : "002"),
-    "empresa" => "0001", // Correct for 77xxxx clients
-    "sucursal" => "0001", // Correct spelling per manual text
-    "puntoVenta" => 13, // Correct for Company 0001
-    "tipoPedido" => "PD", // Keep PD as per dump
-    "listaPrecios" => "3", // Correct casing (listaPrecios)
-    "condicionDeVenta" => "CE", // Correct casing (condicionDeVenta)
-    "items" => $jsonItems,
-    "hora" => date('H:i:s')
-];
+// ================= ENVIAR A SIGMA =================
+$json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
-// Call API
-echo "<h3>Enviando Pedido #$orderId a Sigma...</h3>";
-// MANUAL (Line 11029) says Singular Object.
-// We pass $payload directly. callSigmaApi handles json_encode.
-$result = callSigmaApi('ImportPedidos', [], 'POST', $payload);
+$ch = curl_init(SIGMA_URL . "/ImportPedidos");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "Content-Type: application/json",
+    "X-Auth-Token: " . SIGMA_TOKEN
+]);
 
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curlError = curl_error($ch);
+curl_close($ch);
+
+// ================= OUTPUT DEBUG =================
 echo "<pre>";
-if ($result['http_code'] == 200) {
-    echo "¡Pedido enviado con éxito!\n";
-    print_r($result['response']);
+echo "Enviando Pedido #{$orderId} a Sigma\n";
+echo "----------------------------------\n";
+echo "HTTP Code: {$httpCode}\n\n";
 
-    // Update local status
+if ($httpCode == 200) {
+    // Update local status if success
     $conn->query("UPDATE orders SET estado = 'enviado' WHERE id = $orderId");
-    echo "\nEstado local actualizado a 'Enviado'.";
-} else {
-    echo "Error al enviar pedido:\n";
-    echo "HTTP Code: " . $result['http_code'] . "\n";
-    echo "Error: " . ($result['error'] ?? '') . "\n";
-    echo "Response: " . $result['raw_response'] . "\n";
-
-    echo "\nPayload Sent:\n";
-    echo json_encode($payload, JSON_PRETTY_PRINT);
+    echo "¡Pedido marcado como ENVIADO en base de datos local!\n\n";
 }
+
+if ($curlError) {
+    echo "CURL ERROR:\n{$curlError}\n\n";
+}
+
+echo "PAYLOAD ENVIADO:\n";
+echo $json . "\n\n";
+
+echo "RESPUESTA SIGMA:\n";
+echo $response . "\n";
 echo "</pre>";
 
-?>
-<br>
-<a href="pedidos.php" class="btn btn-secondary">Volver a Pedidos</a>
+echo '<br><a href="pedidos.php" class="btn btn-secondary">Volver a Pedidos</a>';

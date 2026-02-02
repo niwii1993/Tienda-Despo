@@ -78,12 +78,34 @@ const GrupoDespo = (function () {
                         if (callback) callback();
                     } else {
                         console.error(data.message);
-                        if (callback) alert("Error: " + data.message);
+                        if (callback) {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Atención',
+                                    text: data.message,
+                                    confirmButtonColor: '#0d47a1'
+                                });
+                            } else {
+                                alert("Error: " + data.message);
+                            }
+                        }
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    if (callback) alert("Error de conexión");
+                    if (callback) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error de conexión con el servidor',
+                                confirmButtonColor: '#0d47a1'
+                            });
+                        } else {
+                            alert("Error de conexión");
+                        }
+                    }
                 });
         },
 
